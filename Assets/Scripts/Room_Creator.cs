@@ -137,8 +137,9 @@ public class Room_Creator : MonoBehaviour
         //        texBoi.SetPixel(i, j, bkgd);
 
         //texBoi.Apply();
-        var eyeTexture = FoveManager.GetEyesImage();
-        rimage.texture = eyeTexture;//texBoi;
+        Result<Texture2D> eyeTexture = FoveManager.GetEyesImage();
+        Debug.Log(eyeTexture.value);
+        rimage.texture = eyeTexture.value;//texBoi;
     }
     private float randTors;
     private Color bkgd;

@@ -376,6 +376,14 @@ namespace Fove.Unity
             return Headset.GetEyeState(eye);
         }
 
+
+        /// Raul Made Func
+        public static Bitmap theEyeImage()
+        {
+
+            return Instance.eyesImage;
+        }
+
         /// <summary>
         /// Returns whether eye tracking is calibrated and usable
         /// <para></para>

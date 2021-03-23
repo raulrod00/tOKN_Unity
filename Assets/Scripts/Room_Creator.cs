@@ -69,6 +69,8 @@ public class Room_Creator : MonoBehaviour
     [SerializeField]
     private RawImage rimage;
 
+    private Texture2D dogs;
+
     IEnumerator Wait_for_calibration()
     {
         Debug.Log("IsCal?");
@@ -94,7 +96,7 @@ public class Room_Creator : MonoBehaviour
 
         //InvokeRepeating("createRandomFeed", 0.2f, 0.1f);
         InvokeRepeating("getTorsionValuesForGraph", 0.1f, 0.1f);
-        InvokeRepeating("Temp_Texts", 0.1f, 0.5f);
+        InvokeRepeating("Temp_Texts", 2f, 0.5f);
 
         ////Eyes Stuff///////////////////////////
         texBoi = new Texture2D(480, 190);
@@ -104,6 +106,11 @@ public class Room_Creator : MonoBehaviour
 
         texBoi.Apply();
         rimage.texture = texBoi;
+
+        dogs = new Texture2D(640, 240, TextureFormat.RGB24, false);
+
+
+        //Debug.Log(dogs);
         //Apply(rimage, texBoi);
 
     }
@@ -119,11 +126,16 @@ public class Room_Creator : MonoBehaviour
             return;
 
         
+
     }
     //////////////////////////////////////////////////////////////////////////////////////////
     
     private void Temp_Texts()
     {
+
+        dogs.LoadRawTextureData(FoveManager.theEyeImage().ImageData.data, (int)FoveManager.theEyeImage().ImageData.length);
+        dogs.Apply();
+        rimage.texture = dogs;
         //eyes Handling
         //bkgd = new Color(
         //    Random.Range(0f, 1f),
@@ -137,9 +149,9 @@ public class Room_Creator : MonoBehaviour
         //        texBoi.SetPixel(i, j, bkgd);
 
         //texBoi.Apply();
-        Result<Texture2D> eyeTexture = FoveManager.GetEyesImage();
-        Debug.Log(eyeTexture.value);
-        rimage.texture = eyeTexture.value;//texBoi;
+        //Result<Texture2D> eyeTexture = FoveManager.GetEyesImage();
+        //Debug.Log(eyeTexture.value);
+        //rimage.texture = eyeTexture.value;//texBoi;
     }
     private float randTors;
     private Color bkgd;

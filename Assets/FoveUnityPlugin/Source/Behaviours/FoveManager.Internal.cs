@@ -287,7 +287,7 @@ namespace Fove.Unity
                 if (xface.isActiveAndEnabled)
                 {
                     if (xface.fetchGaze)
-                        capabilities |= ClientCapabilities.EyeTracking | ClientCapabilities.GazeDepth;
+                        capabilities |= ClientCapabilities.EyeTracking | ClientCapabilities.GazeDepth | ClientCapabilities.EyeTorsion | ClientCapabilities.EyesImage;
                     if (xface.fetchOrientation)
                         capabilities |= ClientCapabilities.OrientationTracking;
                     if (xface.fetchPosition)

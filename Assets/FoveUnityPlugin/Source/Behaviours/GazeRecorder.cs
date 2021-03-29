@@ -93,6 +93,9 @@ public class GazeRecorder : MonoBehaviour
 
         [Tooltip("The torsion of the left & right eyes in degree")]
         public bool EyeTorsion = true;
+
+        [Tooltip("2D Pixel Coordinates")]
+        public bool EyeShape = true;
     }
 
     // Require a reference (assigned via the Unity Inspector panel) to a FoveInterface object.
@@ -151,6 +154,7 @@ public class GazeRecorder : MonoBehaviour
         public Stereo<Result<EyeState>> EyesState;
         public Stereo<Result<float>> PupilsRadius;
         public Stereo<Result<float>> EyeTorsions;
+        public Stereo<Result<Fove.Unity.EyeShape>> EyeShape;
     }
 
 
@@ -260,6 +264,8 @@ public class GazeRecorder : MonoBehaviour
             caps |= ClientCapabilities.GazedObjectDetection;
         if (exportFields.EyeTorsion)
             caps |= ClientCapabilities.EyeTorsion;
+        if (exportFields.EyeShape)
+            caps |= ClientCapabilities.EyeShape;
 
         FoveManager.RegisterCapabilities(caps); 
 
@@ -411,6 +417,7 @@ public class GazeRecorder : MonoBehaviour
         bool frameMarked;
         Result<string> gazedObjectName;
         Matrix4x4 transformMat;
+
         lock (unityThreadData)
         {
             switch (gazeCoordinateSpace)
@@ -451,6 +458,9 @@ public class GazeRecorder : MonoBehaviour
         var eyeTorsionL = FoveManager.GetEyeTorsion(Eye.Left);
         var eyeTorsionR = FoveManager.GetEyeTorsion(Eye.Right);
 
+        var eyeShapeL = FoveManager.GetEyeShape(Eye.Left);
+        var eyeShapeR = FoveManager.GetEyeShape(Eye.Right);
+
         // If you add new fields, be sure to write them here.
         var datum = new Datum
         {
@@ -462,8 +472,10 @@ public class GazeRecorder : MonoBehaviour
             EyeRays = eyeRays,
             EyesState = new Stereo<Result<EyeState>>(eyeStateL, eyeStateR),
             PupilsRadius = new Stereo<Result<float>>(pupilRadiusLeft, pupilRadiusRight),
-            EyeTorsions = new Stereo<Result<float>>(eyeTorsionL, eyeTorsionR)
+            EyeTorsions = new Stereo<Result<float>>(eyeTorsionL, eyeTorsionR),
+            EyeShape = new Stereo<Result<Fove.Unity.EyeShape>>(eyeShapeL, eyeShapeR)
         };
+
         dataSlice.Add(datum);
 
         if (dataSlice.Count >= writeAtDataCount) 
@@ -561,8 +573,9 @@ public class GazeRecorder : MonoBehaviour
         private const string EyeStateHeader = "Eye State";
         private const string PupilRadiusHeader = "Pupil radius (millimeters)";
         private const string EyeTorsionHeader = "Eye torsion (degrees)";
+        private const string EyeShapeHeader = "Eye Shape (??)";
 
-        private readonly ExportSettings export;
+    private readonly ExportSettings export;
 
         public DataHeaderSerializer(ExportSettings export)
         {
@@ -644,7 +657,10 @@ public class GazeRecorder : MonoBehaviour
             if (export.EyeTorsion)
                 appendLeftRight(builder, EyeTorsionHeader);
 
-            builder.Remove(builder.Length - 1, 1); // remove the last separator of the line
+            if (export.EyeShape)
+                appendLeftRight(builder, EyeShapeHeader);
+
+        builder.Remove(builder.Length - 1, 1); // remove the last separator of the line
             builder.AppendLine();
         }
     }
@@ -657,6 +673,7 @@ public class GazeRecorder : MonoBehaviour
 
         private string timeFormat;
         private string torsionFormat;
+        private string shapeFormat;
         private string vectorFormat;
         private string eyeSizeFormat;
 
@@ -664,7 +681,7 @@ public class GazeRecorder : MonoBehaviour
         {
             this.export = export;
 
-            // Setup the significant digits argument strings used when serializing numbers to text for the CSV
+        // Setup the significant digits argument strings used when serializing numbers to text for the CSV
             torsionFormat = "{0:F2}";
             vectorFormat = "{0:F3}";
             timeFormat = "{0:F4}";
@@ -696,6 +713,15 @@ public class GazeRecorder : MonoBehaviour
         private void Append(StringBuilder builder, string format, Result<float> result)
         {
             Append(builder, format, result.value, result.error);
+        }
+
+        private void Append(StringBuilder builder, IEnumerable<Vector2> result, ErrorCode errCde, int test, int test1)
+        {
+            foreach (Vector2 dog in result)
+            {
+                Append(builder, vectorFormat, dog.x, errCde);
+                Append(builder, vectorFormat, dog.y, errCde);
+            }
         }
 
         private void Append(StringBuilder builder, Result<Vector3> result)
@@ -765,7 +791,13 @@ public class GazeRecorder : MonoBehaviour
                     Append(builder, torsionFormat, datum.EyeTorsions.right);
                 }
 
-                if (builder.Length > 2) // remove the last "," of the line
+                if (export.EyeShape)
+                {
+                    Append(builder, datum.EyeShape.left.value.Outline, datum.EyeShape.left.error, 0, 1);
+                    Append(builder, datum.EyeShape.right.value.Outline, datum.EyeShape.right.error, 1, 0);
+                }
+
+            if (builder.Length > 2) // remove the last "," of the line
                     builder.Remove(builder.Length - 1, 1);
 
                 builder.AppendLine();

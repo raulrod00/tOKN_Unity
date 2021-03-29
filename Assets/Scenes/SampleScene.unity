@@ -155,6 +155,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myPrefab: {fileID: 704048582}
   calibrate: {fileID: 2011797413}
+  rue: {fileID: 0}
   windowGraphGO: {fileID: 1185101161}
   rimage: {fileID: 2065586567}
 --- !u!4 &86919210
@@ -2625,7 +2626,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4000013084846212, guid: 042142d01b081ab4ca555ec74a04c2cb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4000013084846212, guid: 042142d01b081ab4ca555ec74a04c2cb, type: 3}
       propertyPath: m_LocalRotation.w

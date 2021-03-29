@@ -59,6 +59,13 @@ public class Room_Creator : MonoBehaviour
 
     private bool overlap = false;
 
+    /// <summary>
+    /// GazeableObject section Attempt
+    /// </summary>
+    /// 
+
+    private Fove.Unity.GazableObject rue;
+
     //////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     public GameObject windowGraphGO;
@@ -97,6 +104,7 @@ public class Room_Creator : MonoBehaviour
         //InvokeRepeating("createRandomFeed", 0.2f, 0.1f);
         InvokeRepeating("getTorsionValuesForGraph", 0.1f, 0.1f);
         InvokeRepeating("Temp_Texts", 2f, 0.5f);
+        InvokeRepeating("Get_Gaze", 2f, 0.5f);
 
         ////Eyes Stuff///////////////////////////
         texBoi = new Texture2D(480, 190);
@@ -128,8 +136,12 @@ public class Room_Creator : MonoBehaviour
         
 
     }
-    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////>
     
+    private void Get_Gaze()
+    {
+        Debug.Log(FoveManager.GetGazedObject());
+    }
     private void Temp_Texts()
     {
 
@@ -499,11 +511,14 @@ public class Room_Creator : MonoBehaviour
         }
         // Creates a fixation point at index count (since c# is 0 indexed, any code to alter circles would be < count)
         circles.Add(Instantiate(myPrefab, new Vector3(0, 0, -4.97f), Quaternion.identity) as GameObject);
-        circles[count].transform.localScale = new Vector3(0.25f, 0.25f, 1);
+        circles[count].transform.localScale = new Vector3(0.1f, 0.1f, 1);
         circles[count].GetComponent<SpriteRenderer>().color = UnityEngine.Color.red;
+        circles[count].AddComponent<UnityEngine.MeshCollider>();
+        circles[count].AddComponent<Fove.Unity.GazableObject>();
         circles[0].GetComponent<Renderer>().enabled = false;
     }
 
+    BoxCollider boxCollider;
 
     public void Delay()
     {

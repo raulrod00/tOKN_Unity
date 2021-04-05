@@ -1,6 +1,6 @@
 {
   "scaler": 0.5,
-  "rotationSpeed": [ "12", "20", "30", "40" ],
+  "rotationSpeed": [ "-30", "-20", "-10", "0", "0", "10", "20", "30"],
   "width": 5,
   "height": 5,
   "depth": 10,
@@ -17,5 +17,9 @@
   "y_range_max": 0.2,
   "z_range_min": 0.2,
   "z_range_max": 0.2,
-  "trialTracker": 0
+  "trialTracker": 0,
+  "conditionRepeat": 5,
+  "staticStartTime": 5,
+  "rotationTime": 30,
+  "darknessEndTime": 10
 }

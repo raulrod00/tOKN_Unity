@@ -59,6 +59,12 @@ public class Room_Creator : MonoBehaviour
 
     private bool overlap = false;
 
+    // Start new Additions Section
+
+    private int start_delay;
+    private int spin_time;
+    private int dark_time;
+
     /// <summary>
     /// GazeableObject section Attempt
     /// </summary>
@@ -118,6 +124,7 @@ public class Room_Creator : MonoBehaviour
         dogs = new Texture2D(640, 240, TextureFormat.RGB24, false);
 
 
+
         //Debug.Log(dogs);
         //Apply(rimage, texBoi);
 
@@ -140,7 +147,7 @@ public class Room_Creator : MonoBehaviour
     
     private void Get_Gaze()
     {
-        Debug.Log(FoveManager.GetGazedObject());
+        //Debug.Log(FoveManager.GetGazedObject());
     }
     private void Temp_Texts()
     {
@@ -226,36 +233,54 @@ public class Room_Creator : MonoBehaviour
         var rotSpd = session.settings.GetStringList("rotationSpeed");
         var buff = session.settings.GetStringList("buffer");
         var control = session.settings.GetStringList("control");
+        var repCond = session.settings.GetInt("conditionRepeat");
 
+        List<string[]> tempList = new List<string[]>();
         trialList = new List<string[]>();
-
-        if (f_String.getLoadingBool())
+        var condCtr = 0;
+        
+        while (condCtr < repCond)
         {
-            trialList = f_String.t_List();
-        }
-        else
-        {
-
-            foreach (var p in rotSpd)
+            if (f_String.getLoadingBool())
             {
-                foreach (var q in buff)
+                tempList = f_String.t_List();
+            }
+            else
+            {
+
+                foreach (var p in rotSpd)
                 {
-                    foreach (var r in control)
+                    foreach (var q in buff)
                     {
-                        foreach (var s in overLap)
+                        foreach (var r in control)
                         {
-                            string[] temp = new string[] { p, q, r, s };
-                            trialList.Add(temp);
+                            foreach (var s in overLap)
+                            {
+                                string[] temp = new string[] { p, q, r, s };
+                                tempList.Add(temp);
+                            }
                         }
                     }
                 }
-            }
 
-            trialList.Shuffle();
+                tempList.Shuffle();
+            }
+            trialList.AddRange(tempList);
+            
+            tempList.Clear();
+
+            condCtr = condCtr + 1;
         }
-        
+
+
         //session.settings.SetValue("trialOrder", trialList);
-        //Debug.Log(trialList);
+        //foreach (var i in trialList)
+        //{
+        //    foreach (var k in i)
+        //    {
+        //        Debug.Log(k);
+        //    }
+        //}
 
         int totalTrials = (rotSpd.Count * buff.Count * control.Count * overLap.Count);
 
@@ -298,6 +323,10 @@ public class Room_Creator : MonoBehaviour
         session.settings.SetValue("y_range_max", y_range_max);
         session.settings.SetValue("z_range_min", z_range_min);
         session.settings.SetValue("z_range_max", z_range_max);
+
+        start_delay = session.settings.GetInt("staticStartTime");
+        spin_time = session.settings.GetInt("rotationTime");
+        dark_time = session.settings.GetInt("darknessEndTime");
 
         FoveManager.TareOrientation();
 
@@ -423,8 +452,6 @@ public class Room_Creator : MonoBehaviour
     public void makeCircles()
     {
         scaler = Session.instance.settings.GetFloat("scaler");
-
-        Debug.Log("Moo");
 
         // Set the number of circles in each wall
         backCircles = Session.instance.settings.GetInt("backCircles");
@@ -731,11 +758,11 @@ public class Room_Creator : MonoBehaviour
         }
         GenerateRoom(Session.instance.CurrentTrial);
 
-        yield return new WaitForSeconds(2); // Wait a few seconds before spinning begins New Trials start here
+        yield return new WaitForSeconds(start_delay); // Wait a few seconds before spinning begins New Trials start here
 
         spin = true;
         
-        yield return new WaitForSeconds(5); // Spinning time
+        yield return new WaitForSeconds(spin_time); // Spinning time
         spin = false;
         foreach (Transform child in circles[0].transform)
         {
@@ -744,7 +771,7 @@ public class Room_Creator : MonoBehaviour
         inDark = true;
         GameObject.Find("RecorderObject").GetComponent<GazeRecorder>().frameMarker = false;
 
-        yield return new WaitForSeconds(2); // Pause for a few seconds after spin
+        yield return new WaitForSeconds(dark_time); // Pause for a few seconds after spin
 
         if (pauseSession)
         {

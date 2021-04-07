@@ -19,7 +19,7 @@
   "z_range_max": 0.2,
   "trialTracker": 0,
   "conditionRepeat": 5,
-  "staticStartTime": 5,
-  "rotationTime": 30,
-  "darknessEndTime": 10
+  "staticStartTime": 1,
+  "rotationTime": 3,
+  "darknessEndTime": 2
 }

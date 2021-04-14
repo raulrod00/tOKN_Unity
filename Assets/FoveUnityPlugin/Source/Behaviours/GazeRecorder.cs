@@ -96,6 +96,9 @@ public class GazeRecorder : MonoBehaviour
 
         [Tooltip("2D Pixel Coordinates")]
         public bool EyeShape = true;
+
+        [Tooltip("2D Pixel Coordinates for Pupil")]
+        public bool PupilShape = true;
     }
 
     // Require a reference (assigned via the Unity Inspector panel) to a FoveInterface object.
@@ -155,6 +158,7 @@ public class GazeRecorder : MonoBehaviour
         public Stereo<Result<float>> PupilsRadius;
         public Stereo<Result<float>> EyeTorsions;
         public Stereo<Result<Fove.Unity.EyeShape>> EyeShape;
+        public Stereo<Result<Fove.Unity.PupilShape>> PupilShape;
     }
 
 
@@ -266,6 +270,8 @@ public class GazeRecorder : MonoBehaviour
             caps |= ClientCapabilities.EyeTorsion;
         if (exportFields.EyeShape)
             caps |= ClientCapabilities.EyeShape;
+        if (exportFields.PupilShape)
+            caps |= ClientCapabilities.PupilShape;
 
         FoveManager.RegisterCapabilities(caps); 
 
@@ -461,6 +467,9 @@ public class GazeRecorder : MonoBehaviour
         var eyeShapeL = FoveManager.GetEyeShape(Eye.Left);
         var eyeShapeR = FoveManager.GetEyeShape(Eye.Right);
 
+        var pupShapeL = FoveManager.GetPupilShape(Eye.Left);
+        var pupShapeR = FoveManager.GetPupilShape(Eye.Right);
+
         // If you add new fields, be sure to write them here.
         var datum = new Datum
         {
@@ -473,7 +482,8 @@ public class GazeRecorder : MonoBehaviour
             EyesState = new Stereo<Result<EyeState>>(eyeStateL, eyeStateR),
             PupilsRadius = new Stereo<Result<float>>(pupilRadiusLeft, pupilRadiusRight),
             EyeTorsions = new Stereo<Result<float>>(eyeTorsionL, eyeTorsionR),
-            EyeShape = new Stereo<Result<Fove.Unity.EyeShape>>(eyeShapeL, eyeShapeR)
+            EyeShape = new Stereo<Result<Fove.Unity.EyeShape>>(eyeShapeL, eyeShapeR),
+            PupilShape = new Stereo<Result<Fove.Unity.PupilShape>>(pupShapeL, pupShapeR)
         };
 
         dataSlice.Add(datum);
@@ -574,8 +584,9 @@ public class GazeRecorder : MonoBehaviour
         private const string PupilRadiusHeader = "Pupil radius (millimeters)";
         private const string EyeTorsionHeader = "Eye torsion (degrees)";
         private const string EyeShapeHeader = "Eye Shape (??)";
+        private const string PupShapeHeader = "Pupil Shape (??)";
 
-    private readonly ExportSettings export;
+        private readonly ExportSettings export;
 
         public DataHeaderSerializer(ExportSettings export)
         {
@@ -660,7 +671,10 @@ public class GazeRecorder : MonoBehaviour
             if (export.EyeShape)
                 appendLeftRight(builder, EyeShapeHeader);
 
-        builder.Remove(builder.Length - 1, 1); // remove the last separator of the line
+            if (export.PupilShape)
+                appendLeftRight(builder, PupShapeHeader);
+
+            builder.Remove(builder.Length - 1, 1); // remove the last separator of the line
             builder.AppendLine();
         }
     }
@@ -722,6 +736,14 @@ public class GazeRecorder : MonoBehaviour
                 Append(builder, vectorFormat, dog.x, errCde);
                 Append(builder, vectorFormat, dog.y, errCde);
             }
+        }
+
+        private void Append(StringBuilder builder, Vector2 result, ErrorCode errCde, int test, int test1, int test2)
+        {
+
+            Append(builder, vectorFormat, result.x, errCde);
+            Append(builder, vectorFormat, result.y, errCde);
+
         }
 
         private void Append(StringBuilder builder, Result<Vector3> result)
@@ -797,7 +819,13 @@ public class GazeRecorder : MonoBehaviour
                     Append(builder, datum.EyeShape.right.value.Outline, datum.EyeShape.right.error, 1, 0);
                 }
 
-            if (builder.Length > 2) // remove the last "," of the line
+                if (export.PupilShape)
+                {
+                    Append(builder, datum.PupilShape.left.value.center, datum.PupilShape.left.error, 0, 1, 2);
+                    Append(builder, datum.PupilShape.right.value.center, datum.PupilShape.right.error, 1, 0, 2);
+                }
+
+                if (builder.Length > 2) // remove the last "," of the line
                     builder.Remove(builder.Length - 1, 1);
 
                 builder.AppendLine();

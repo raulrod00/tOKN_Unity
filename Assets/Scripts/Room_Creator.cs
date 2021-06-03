@@ -229,6 +229,8 @@ public class Room_Creator : MonoBehaviour
         //canvas.enabled = false;
         GameObject.Find("RecorderObject").GetComponent<GazeRecorder>().shouldRecord = true;
 
+        List<string> = sesion.settings.GetStringList();
+
         var overLap = session.settings.GetStringList("overlap");
         var rotSpd = session.settings.GetStringList("rotationSpeed");
         var buff = session.settings.GetStringList("buffer");
@@ -266,6 +268,23 @@ public class Room_Creator : MonoBehaviour
                 tempList.Shuffle();
             }
             trialList.AddRange(tempList);
+
+            // Randomizing the image numbers
+            imageNummbers.shuffle();
+            // Setting the random numbers to the list
+            for (int i = 0; i < imageNumbers.Length; i++)
+            {
+                
+                trialList[i][2] = imageNumbers[i];
+            }
+
+            //imageNumbers.Shuffle();
+            //for (int i = 30; i < 60; i++)
+            //{
+            //    trialList[i][2] = imageNumbers[i - 30];
+            //}
+
+
             
             tempList.Clear();
 

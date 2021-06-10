@@ -66,27 +66,35 @@ public class FPSDisplay : MonoBehaviour
         deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.1f;
     }
 
+
+    //////////////////////////////////////////////////////////////////////
+    ///                         MAGIC!!!!!!
+    //////////////////////////////////////////////////////////////////////
     void OnGUI()
 	{
+        // Automatically grab the dimensions
 		int w = Screen.width, h = Screen.height;
 
+        // Change the Graphical User Interface's Style
 		GUIStyle style = new GUIStyle();
 
+        // Creates a home for the text
 		Rect rect = new Rect(0, h-(h/40), w, h);// / 50);
+
+        // Style, yo!
 		style.alignment = TextAnchor.UpperLeft;
 		style.fontSize = h/40;// / 50;
 		style.normal.textColor = new Color(255.0f, 0.0f, 0.0f, 1.0f);
 
+        // My Bullshit
         float msec = deltaTime * 1000.0f;
         float fps = 1.0f / deltaTime;
 
+        // What I want displayed and formatted
         string text = "Trial Status: " +  trialStatus + " " + trialNum + blockNum + " " +string.Format("{0:0.0} ms ({1:0.} fps)", msec, fps);
+
+        // Paste the stuff to the box!
 		GUI.Label(rect, text, style);
-
-        //Rect graphHolder = new Rect(0, 0, 400, 400);
-
-        //GUI.backgroundColor = Color.red;
-        //GUI.Button(graphHolder, "red button", style);
         
 
     }
